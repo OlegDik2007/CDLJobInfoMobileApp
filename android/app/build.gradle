@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'info.cdljob.driverhub'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'info.cdljob.driverhub'
+        minSdk 26
+        targetSdk 36
+        versionCode 5
+        versionName '0.3.2'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    defaultConfig {
+        buildConfigField 'String', 'FIREBASE_PROJECT_ID', '"' + (System.getenv('FIREBASE_PROJECT_ID') ?: '') + '"'
+        buildConfigField 'String', 'FIREBASE_APPLICATION_ID', '"' + (System.getenv('FIREBASE_APPLICATION_ID') ?: '') + '"'
+        buildConfigField 'String', 'FIREBASE_API_KEY', '"' + (System.getenv('FIREBASE_API_KEY') ?: '') + '"'
+        buildConfigField 'String', 'FIREBASE_GCM_SENDER_ID', '"' + (System.getenv('FIREBASE_GCM_SENDER_ID') ?: '') + '"'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.google.firebase:firebase-messaging:24.1.1'
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
+}
