@@ -1,0 +1,23 @@
+name: CDLDriverHub
+options:
+  bundleIdPrefix: info.cdljob
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: 16.0
+    SWIFT_VERSION: 5.0
+targets:
+  CDLDriverHub:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - CDLDriverHub
+    info:
+      path: CDLDriverHub/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: info.cdljob.driverhub
+        MARKETING_VERSION: 0.3.0
+        CURRENT_PROJECT_VERSION: 3
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: 1
