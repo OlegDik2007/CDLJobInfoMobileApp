@@ -15,7 +15,7 @@ struct DriverHubWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        configuration.applicationNameForUserAgent = "CDLDriverHubIOS/0.3 SwiftUI"
+        configuration.applicationNameForUserAgent = "CDLHubInfoIOS/0.4 SwiftUI"
 
         let controller = configuration.userContentController
         controller.add(context.coordinator, name: "cdlNative")
@@ -58,7 +58,7 @@ struct DriverHubWebView: UIViewRepresentable {
             ? URL(string: "https://cdljob.info/mobile-app/#alerts")!
             : appURL
 
-        webView.load(URLRequest(url: initialURL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30))
+        webView.load(URLRequest(url: initialURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
         return webView
     }
 
@@ -92,7 +92,7 @@ struct DriverHubWebView: UIViewRepresentable {
 
         @objc private func openRoadAlerts() {
             UserDefaults.standard.set(false, forKey: "cdl_open_alerts")
-            webView?.load(URLRequest(url: URL(string: "https://cdljob.info/mobile-app/#alerts")!))
+            webView?.load(URLRequest(url: URL(string: "https://cdljob.info/mobile-app/#alerts")!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
