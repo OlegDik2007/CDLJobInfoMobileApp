@@ -1,6 +1,6 @@
-# CDLJobInfo Mobile App
+# CDL Hub Mobile App
 
-Native mobile apps for CDLJOBINFO Driver Hub.
+Native mobile apps for CDL Hub.
 
 ## Apps
 
