@@ -16,7 +16,7 @@ struct DriverHubWebView: UIViewRepresentable {
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.allowsInlineMediaPlayback = true
-        configuration.applicationNameForUserAgent = "CDLHubInfoIOS/0.5 SwiftUI"
+        configuration.applicationNameForUserAgent = "CDLHubIOS/0.6 SwiftUI"
 
         let controller = configuration.userContentController
         controller.add(context.coordinator, name: "cdlNative")
