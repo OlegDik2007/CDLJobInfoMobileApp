@@ -1,0 +1,3 @@
+"CFBundleDisplayName" = "CDL Hub";
+"NSLocationWhenInUseUsageDescription" = "CDL Hub yaqin yo‘l ogohlantirishlari, kameralar va ob-havo ma’lumotlarini ko‘rsatish uchun joylashuvingizdan foydalanadi.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "CDL Hub ilova yopiq bo‘lsa ham muhim avariyalar, yopilishlar, cheklovlar va jiddiy yo‘l xavflari haqida xabar berishi uchun yo‘l ogohlantirishlari joylashuvingizni yangilab turishiga ruxsat bering.";
