@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CDL Hub</string>
+    <string name="location_off_message">Геолокацію вимкнено. Скористайтеся пошуком дороги в застосунку.</string>
+    <string name="road_alert_tracking_channel">Відстеження дорожніх попереджень</string>
+    <string name="road_alert_tracking_description">Підтримує актуальне місцезнаходження для дорожніх попереджень, коли CDL Hub закритий.</string>
+    <string name="road_alerts_active_title">Дорожні попередження CDL Hub активні</string>
+    <string name="monitoring_road_area">Відстеження вашої дороги для нових попереджень безпеки</string>
+    <string name="road_alerts_channel">Дорожні попередження</string>
+    <string name="road_alerts_channel_description">Аварії, перекриття, обмеження та серйозні дорожні попередження поруч із водієм</string>
+    <string name="road_alert_nearby">Дорожнє попередження поруч</string>
+    <string name="open_cdl_hub_details">Відкрийте CDL Hub для деталей.</string>
+</resources>
