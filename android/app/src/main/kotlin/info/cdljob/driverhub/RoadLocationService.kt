@@ -68,10 +68,10 @@ class RoadLocationService : Service() {
         manager.createNotificationChannel(
             NotificationChannel(
                 SERVICE_CHANNEL_ID,
-                "Road alert tracking",
+                getString(R.string.road_alert_tracking_channel),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Keeps your road-alert location current while CDL Live Road is closed."
+                description = getString(R.string.road_alert_tracking_description)
             }
         )
 
@@ -85,8 +85,8 @@ class RoadLocationService : Service() {
 
         return android.app.Notification.Builder(this, SERVICE_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setContentTitle("CDL Live Road alerts active")
-            .setContentText("Monitoring your road area for new safety alerts")
+            .setContentTitle(getString(R.string.road_alerts_active_title))
+            .setContentText(getString(R.string.monitoring_road_area))
             .setOngoing(true)
             .setContentIntent(pending)
             .build()
