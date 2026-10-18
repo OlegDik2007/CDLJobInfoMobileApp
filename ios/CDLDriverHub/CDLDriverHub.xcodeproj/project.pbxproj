@@ -13,6 +13,7 @@
 		A10000000000000000000004 /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* LocationPermissionManager.swift */; };
 		A10000000000000000000005 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* AppDelegate.swift */; };
 		A10000000000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* Assets.xcassets */; };
+		A10000000000000000000007 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A40000000000000000000004 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,11 @@
 		A20000000000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000000000000000000007 /* CDLDriverHub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CDLDriverHub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A20000000000000000000009 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2000000000000000000000A /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2000000000000000000000B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2000000000000000000000C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2000000000000000000000D /* uz */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uz; path = uz.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +61,7 @@
 				A20000000000000000000005 /* AppDelegate.swift */,
 				A20000000000000000000006 /* Info.plist */,
 				A20000000000000000000008 /* Assets.xcassets */,
+				A40000000000000000000004 /* InfoPlist.strings */,
 			);
 			path = CDLDriverHub;
 			sourceTree = "<group>";
@@ -108,6 +115,10 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				uk,
+				ru,
+				es,
+				uz,
 				Base,
 			);
 			mainGroup = A40000000000000000000001;
@@ -126,10 +137,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000006 /* Assets.xcassets in Resources */,
+				A10000000000000000000007 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A40000000000000000000004 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A20000000000000000000009 /* en */,
+				A2000000000000000000000A /* uk */,
+				A2000000000000000000000B /* ru */,
+				A2000000000000000000000C /* es */,
+				A2000000000000000000000D /* uz */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A30000000000000000000002 /* Sources */ = {
