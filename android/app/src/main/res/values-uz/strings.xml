@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CDL Hub</string>
+    <string name="location_off_message">Joylashuv o‘chiq. Ilovadagi yo‘l qidiruvidan foydalaning.</string>
+    <string name="road_alert_tracking_channel">Yo‘l ogohlantirishlarini kuzatish</string>
+    <string name="road_alert_tracking_description">CDL Hub yopiq bo‘lsa ham yo‘l ogohlantirishlari uchun joylashuvingizni yangilab turadi.</string>
+    <string name="road_alerts_active_title">CDL Hub yo‘l ogohlantirishlari faol</string>
+    <string name="monitoring_road_area">Yangi xavfsizlik ogohlantirishlari uchun yo‘l hududingiz kuzatilmoqda</string>
+    <string name="road_alerts_channel">Yo‘l ogohlantirishlari</string>
+    <string name="road_alerts_channel_description">Haydovchi yaqinidagi avariyalar, yopilishlar, cheklovlar va jiddiy yo‘l ogohlantirishlari</string>
+    <string name="road_alert_nearby">Yaqinda yo‘l ogohlantirishi bor</string>
+    <string name="open_cdl_hub_details">Tafsilotlar uchun CDL Hub’ni oching.</string>
+</resources>
