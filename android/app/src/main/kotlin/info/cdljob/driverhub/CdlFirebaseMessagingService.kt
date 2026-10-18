@@ -24,10 +24,10 @@ class CdlFirebaseMessagingService : FirebaseMessagingService() {
 
         val title = message.notification?.title
             ?: message.data["title"]
-            ?: "Road alert nearby"
+            ?: getString(R.string.road_alert_nearby)
         val body = message.notification?.body
             ?: message.data["body"]
-            ?: "Open CDL Live Road for details."
+            ?: getString(R.string.open_cdl_hub_details)
         val alertKey = message.data["alert_key"]
 
         if (!alertKey.isNullOrBlank()) {
@@ -44,10 +44,10 @@ class CdlFirebaseMessagingService : FirebaseMessagingService() {
         val manager = getSystemService(NotificationManager::class.java)
         val channel = NotificationChannel(
             ALERT_CHANNEL_ID,
-            "Road alerts",
+            getString(R.string.road_alerts_channel),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Crashes, closures, restrictions and severe road alerts near the driver"
+            description = getString(R.string.road_alerts_channel_description)
             enableVibration(true)
         }
         manager.createNotificationChannel(channel)
