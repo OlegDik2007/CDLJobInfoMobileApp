@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CDL Hub</string>
+    <string name="location_off_message">La ubicación está desactivada. Usa la búsqueda de carreteras en la app.</string>
+    <string name="road_alert_tracking_channel">Seguimiento de alertas viales</string>
+    <string name="road_alert_tracking_description">Mantiene actualizada tu ubicación para alertas viales cuando CDL Hub está cerrado.</string>
+    <string name="road_alerts_active_title">Alertas viales de CDL Hub activas</string>
+    <string name="monitoring_road_area">Supervisando tu zona vial para nuevas alertas de seguridad</string>
+    <string name="road_alerts_channel">Alertas viales</string>
+    <string name="road_alerts_channel_description">Choques, cierres, restricciones y alertas viales severas cerca del conductor</string>
+    <string name="road_alert_nearby">Alerta vial cercana</string>
+    <string name="open_cdl_hub_details">Abre CDL Hub para ver los detalles.</string>
+</resources>
