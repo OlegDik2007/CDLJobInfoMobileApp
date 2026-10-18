@@ -184,7 +184,7 @@ class MainActivity : Activity() {
         } else {
             Toast.makeText(
                 this,
-                "Location is off. Use the road search in the app.",
+                getString(R.string.location_off_message),
                 Toast.LENGTH_LONG
             ).show()
         }
