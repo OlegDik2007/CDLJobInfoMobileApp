@@ -1,0 +1,3 @@
+"CFBundleDisplayName" = "CDL Hub";
+"NSLocationWhenInUseUsageDescription" = "CDL Hub uses your location to show nearby road alerts, cameras, and weather information.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Allow CDL Hub to keep your road-alert location current so important crashes, closures, restrictions, and severe road alerts can reach you while the app is not open.";
