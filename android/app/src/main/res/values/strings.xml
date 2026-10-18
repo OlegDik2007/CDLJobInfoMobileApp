@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CDL Hub</string>
+    <string name="location_off_message">Location is off. Use the road search in the app.</string>
+    <string name="road_alert_tracking_channel">Road alert tracking</string>
+    <string name="road_alert_tracking_description">Keeps your road-alert location current while CDL Hub is closed.</string>
+    <string name="road_alerts_active_title">CDL Hub road alerts active</string>
+    <string name="monitoring_road_area">Monitoring your road area for new safety alerts</string>
+    <string name="road_alerts_channel">Road alerts</string>
+    <string name="road_alerts_channel_description">Crashes, closures, restrictions and severe road alerts near the driver</string>
+    <string name="road_alert_nearby">Road alert nearby</string>
+    <string name="open_cdl_hub_details">Open CDL Hub for details.</string>
+</resources>
