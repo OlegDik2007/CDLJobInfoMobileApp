@@ -11,6 +11,7 @@ object DeviceApi {
     private const val BASE_URL = "https://cdljob.info"
     private const val PREFS = "cdl_device_api"
     private const val PUSH_REGISTERED = "push_registered"
+    private const val PUSH_TOKEN = "push_token"
     private val executor = Executors.newSingleThreadExecutor()
 
     private fun deviceId(context: Context): String {
@@ -32,18 +33,27 @@ object DeviceApi {
     }
 
     fun registerPushToken(context: Context, token: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(PUSH_TOKEN, token).apply()
+        setNotificationsEnabled(context, isRoadMonitoringEnabled(context))
+    }
+
+    private fun isRoadMonitoringEnabled(context: Context): Boolean =
+        context.getSharedPreferences("cdl_settings", Context.MODE_PRIVATE)
+            .getBoolean("cdl_road_monitoring_enabled", false)
+
+    fun setNotificationsEnabled(context: Context, enabled: Boolean) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val token = prefs.getString(PUSH_TOKEN, null) ?: return
         val body = JSONObject()
             .put("device_id", deviceId(context))
             .put("platform", "android")
             .put("push_token", token)
             .put("app_version", appVersion(context))
-            .put("enabled", true)
+            .put("enabled", enabled)
 
         post("/api/mobile-device-register", body) { ok, _ ->
-            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .edit()
-                .putBoolean(PUSH_REGISTERED, ok)
-                .apply()
+            prefs.edit().putBoolean(PUSH_REGISTERED, ok && enabled).apply()
         }
     }
 
@@ -63,7 +73,7 @@ object DeviceApi {
             .put("accuracy_meters", accuracyMeters)
             .put("heading", heading)
             .put("app_version", appVersion(context))
-            .put("enabled", true)
+            .put("enabled", isRoadMonitoringEnabled(context))
 
         post("/api/mobile-device-location", body) { ok, response ->
             val configured = ok &&
@@ -87,7 +97,7 @@ object DeviceApi {
                     doOutput = true
                     setRequestProperty("Content-Type", "application/json")
                     setRequestProperty("Accept", "application/json")
-                    setRequestProperty("User-Agent", "CDLDriverHubAndroid/0.3.2")
+                    setRequestProperty("User-Agent", "CDLDriverHubAndroid/0.7.0")
                 }
 
                 connection.outputStream.use {
