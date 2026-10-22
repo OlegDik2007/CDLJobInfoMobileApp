@@ -1,3 +1,5 @@
 "CFBundleDisplayName" = "CDL Hub";
 "NSLocationWhenInUseUsageDescription" = "CDL Hub usa tu ubicación para mostrar alertas viales, cámaras e información meteorológica cercana.";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Permite que CDL Hub mantenga actualizada tu ubicación para alertas viales y pueda avisarte de choques, cierres, restricciones y peligros graves incluso cuando la app esté cerrada.";
+"NSCameraUsageDescription" = "CDL Hub usa la cámara solo cuando eliges compartir una foto de la carretera en el chat temporal.";
+"NSPhotoLibraryUsageDescription" = "CDL Hub accede solo a las fotos que elijas compartir en el chat temporal.";
