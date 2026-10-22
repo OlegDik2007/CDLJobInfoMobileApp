@@ -10,8 +10,8 @@ android {
         applicationId 'info.cdljob.driverhub'
         minSdk 26
         targetSdk 36
-        versionCode 7
-        versionName '0.6.0'
+        versionCode 8
+        versionName '0.7.0'
     }
 
     buildFeatures {
@@ -38,6 +38,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.core:core:1.15.0'
     implementation 'com.google.firebase:firebase-messaging:24.1.1'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
 }
