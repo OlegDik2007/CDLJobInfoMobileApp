@@ -101,7 +101,11 @@ struct DriverHubWebView: UIViewRepresentable {
                   let type = payload["type"] as? String else { return }
 
             if type == "gpsRequested" {
+                locationPermission.requestForegroundLocation()
+            } else if type == "backgroundAlertsRequested" {
                 locationPermission.requestRoadAlertTracking()
+            } else if type == "backgroundAlertsStopped" {
+                locationPermission.stopRoadAlertTracking()
             } else if type == "languageChanged",
                       let language = payload["language"] as? String,
                       ["en", "uk", "ru", "es", "uz"].contains(language) {
