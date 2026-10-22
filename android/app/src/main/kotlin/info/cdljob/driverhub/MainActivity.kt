@@ -8,8 +8,11 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.webkit.GeolocationPermissions
+import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -17,6 +20,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.google.firebase.messaging.FirebaseMessaging
+import androidx.core.content.FileProvider
+import java.io.File
 
 class MainActivity : Activity() {
 
@@ -24,11 +29,14 @@ class MainActivity : Activity() {
         private const val APP_URL = "https://cdljob.info/mobile-app/"
         private const val LOCATION_REQUEST = 101
         private const val NOTIFICATION_REQUEST = 102
+        private const val FILE_CHOOSER_REQUEST = 103
     }
 
     private lateinit var webView: WebView
     private var pendingGeoCallback: GeolocationPermissions.Callback? = null
     private var pendingGeoOrigin: String? = null
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private var cameraImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +101,15 @@ class MainActivity : Activity() {
         }
     }
 
+    private inner class LanguageBridge {
+        @JavascriptInterface
+        fun setLanguage(language: String) {
+            NativeLanguage.set(this@MainActivity, language)
+        }
+    }
+
     private fun configureWebView() {
+        webView.addJavascriptInterface(LanguageBridge(), "CDLNativeLanguage")
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -101,11 +117,62 @@ class MainActivity : Activity() {
             loadWithOverviewMode = true
             useWideViewPort = true
             mediaPlaybackRequiresUserGesture = true
-            userAgentString = "$userAgentString CDLHubAndroid/0.6 Kotlin"
+            userAgentString = "$userAgentString CDLDriverHubAndroid/0.4.1 Kotlin"
             cacheMode = WebSettings.LOAD_DEFAULT
         }
 
         webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                this@MainActivity.filePathCallback?.onReceiveValue(null)
+                this@MainActivity.filePathCallback = filePathCallback
+
+                val galleryIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "image/*"
+                }
+
+                val cameraIntents = mutableListOf<Intent>()
+                val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                if (cameraIntent.resolveActivity(packageManager) != null) {
+                    try {
+                        val photoDir = File(cacheDir, "chat-photos").apply { mkdirs() }
+                        val photoFile = File.createTempFile("chat-", ".jpg", photoDir)
+                        cameraImageUri = FileProvider.getUriForFile(
+                            this@MainActivity,
+                            "$packageName.fileprovider",
+                            photoFile
+                        )
+                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+                        cameraIntent.addFlags(
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                        cameraIntents.add(cameraIntent)
+                    } catch (_: Exception) {
+                        cameraImageUri = null
+                    }
+                }
+
+                return try {
+                    val chooserIntent = Intent.createChooser(galleryIntent, "Add road photo").apply {
+                        if (cameraIntents.isNotEmpty()) {
+                            putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toTypedArray())
+                        }
+                    }
+                    startActivityForResult(chooserIntent, FILE_CHOOSER_REQUEST)
+                    true
+                } catch (_: Exception) {
+                    this@MainActivity.filePathCallback?.onReceiveValue(null)
+                    this@MainActivity.filePathCallback = null
+                    cameraImageUri = null
+                    false
+                }
+            }
+
             override fun onGeolocationPermissionsShowPrompt(
                 origin: String?,
                 callback: GeolocationPermissions.Callback?
@@ -184,7 +251,7 @@ class MainActivity : Activity() {
         } else {
             Toast.makeText(
                 this,
-                getString(R.string.location_off_message),
+                NativeLanguage.t(this, "notification_location_off"),
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -199,6 +266,30 @@ class MainActivity : Activity() {
         if (shouldOpenAlerts(intent) && ::webView.isInitialized) {
             webView.loadUrl("$APP_URL#alerts")
         }
+    }
+
+    @Deprecated("Deprecated in Android; retained for WebView file chooser compatibility")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == FILE_CHOOSER_REQUEST) {
+            val resultUris: Array<Uri>? = if (resultCode != RESULT_OK) {
+                null
+            } else if (data?.clipData != null) {
+                Array(data.clipData!!.itemCount) { index ->
+                    data.clipData!!.getItemAt(index).uri
+                }
+            } else if (data?.data != null) {
+                arrayOf(data.data!!)
+            } else {
+                cameraImageUri?.let { arrayOf(it) }
+            }
+
+            filePathCallback?.onReceiveValue(resultUris)
+            filePathCallback = null
+            cameraImageUri = null
+            return
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
