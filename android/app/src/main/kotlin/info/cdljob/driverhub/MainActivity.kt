@@ -116,6 +116,7 @@ class MainActivity : Activity() {
             return
         }
         getSharedPreferences("cdl_settings", MODE_PRIVATE).edit().putBoolean(MONITOR_PREF, true).apply()
+        DeviceApi.setNotificationsEnabled(this, true)
         startRoadTrackingIfAllowed()
         Toast.makeText(this, NativeLanguage.t(this, "monitor_enabled"), Toast.LENGTH_LONG).show()
     }
@@ -136,6 +137,7 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun stop() = runOnUiThread {
             getSharedPreferences("cdl_settings", MODE_PRIVATE).edit().putBoolean(MONITOR_PREF, false).apply()
+            DeviceApi.setNotificationsEnabled(this@MainActivity, false)
             stopService(Intent(this@MainActivity, RoadLocationService::class.java))
             Toast.makeText(this@MainActivity, NativeLanguage.t(this@MainActivity, "monitor_disabled"), Toast.LENGTH_LONG).show()
         }
