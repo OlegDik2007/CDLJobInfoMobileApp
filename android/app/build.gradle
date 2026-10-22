@@ -30,9 +30,25 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    // Signing credentials are never stored in Git. Release artifacts are signed
+    // only when the deployment workflow injects a validated keystore and secrets.
+    signingConfigs {
+        production {
+            if (System.getenv('ANDROID_KEYSTORE_PATH')) {
+                storeFile file(System.getenv('ANDROID_KEYSTORE_PATH'))
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            if (System.getenv('ANDROID_KEYSTORE_PATH')) {
+                signingConfig signingConfigs.production
+            }
         }
     }
 }
