@@ -20,6 +20,10 @@
     <string>$(CURRENT_PROJECT_VERSION)</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
+    <key>NSCameraUsageDescription</key>
+    <string>CDL Hub uses the camera only when you choose to share a road photo in the 24-hour driver chat.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>CDL Hub accesses photos you select to share in the temporary driver chat.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>CDL Hub uses your location to show nearby road alerts, cameras, and weather information.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
