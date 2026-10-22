@@ -1,0 +1,78 @@
+name: Build signed Google Play AAB
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag e.g. 0.7.0'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  signed-release:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK
+        run: |
+          SDKMANAGER="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+      - name: Validate secrets and unpack keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_B64" || (echo 'Missing Android upload keystore' >&2; exit 1)
+          test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD" || (echo 'Missing signing credentials' >&2; exit 1)
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/cdl-upload.jks"
+          chmod 600 "$RUNNER_TEMP/cdl-upload.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/cdl-upload.jks" >> "$GITHUB_ENV"
+      - name: Verify requested version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          grep -F "versionName '$VERSION'" app/build.gradle >/dev/null || (echo 'Requested version differs from source' >&2; exit 1)
+      - name: Build signed release bundle and APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_APPLICATION_ID: ${{ secrets.FIREBASE_APPLICATION_ID }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_GCM_SENDER_ID: ${{ secrets.FIREBASE_GCM_SENDER_ID }}
+        run: gradle --no-daemon :app:bundleRelease :app:assembleRelease
+      - name: Upload Google Play AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: CDLHub-signed-google-play-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload signed release APK for controlled testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: CDLHub-signed-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Remove signing keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cdl-upload.jks"
