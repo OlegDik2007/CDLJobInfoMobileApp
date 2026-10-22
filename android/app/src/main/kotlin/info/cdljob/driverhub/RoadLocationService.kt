@@ -68,10 +68,10 @@ class RoadLocationService : Service() {
         manager.createNotificationChannel(
             NotificationChannel(
                 SERVICE_CHANNEL_ID,
-                getString(R.string.road_alert_tracking_channel),
+                NativeLanguage.t(this, "tracking_channel"),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = getString(R.string.road_alert_tracking_description)
+                description = NativeLanguage.t(this@RoadLocationService, "tracking_description")
             }
         )
 
@@ -85,8 +85,8 @@ class RoadLocationService : Service() {
 
         return android.app.Notification.Builder(this, SERVICE_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setContentTitle(getString(R.string.road_alerts_active_title))
-            .setContentText(getString(R.string.monitoring_road_area))
+            .setContentTitle(NativeLanguage.t(this, "tracking_title"))
+            .setContentText(NativeLanguage.t(this, "tracking_body"))
             .setOngoing(true)
             .setContentIntent(pending)
             .build()
