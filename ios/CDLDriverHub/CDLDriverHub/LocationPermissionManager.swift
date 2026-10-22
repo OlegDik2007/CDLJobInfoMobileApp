@@ -41,12 +41,14 @@ final class LocationPermissionManager: NSObject, ObservableObject, CLLocationMan
     func stopRoadAlertTracking() {
         UserDefaults.standard.set(false, forKey: backgroundTrackingKey)
         manager.stopMonitoringSignificantLocationChanges()
+        MobileDeviceApi.setPushEnabled(false)
     }
 
     func requestRoadAlertTracking() {
         guard CLLocationManager.locationServicesEnabled() else { return }
 
         UserDefaults.standard.set(true, forKey: backgroundTrackingKey)
+        MobileDeviceApi.setPushEnabled(true)
 
         switch manager.authorizationStatus {
         case .notDetermined:
@@ -108,6 +110,7 @@ final class LocationPermissionManager: NSObject, ObservableObject, CLLocationMan
         }
 
         previousLocation = location
+        guard UserDefaults.standard.bool(forKey: backgroundTrackingKey) else { return }
 
         MobileDeviceApi.updateLocation(
             latitude: location.coordinate.latitude,
@@ -141,6 +144,8 @@ private extension CLLocation {
 enum MobileDeviceApi {
     private static let baseURL = URL(string: "https://cdljob.info")!
     private static let fallbackDeviceIdKey = "cdl_ios_device_id"
+    private static let pushTokenKey = "cdl_ios_push_token"
+    private static let monitorKey = "cdl_background_road_alerts_enabled"
 
     private static var deviceId: String {
         if let identifier = UIDevice.current.identifierForVendor?.uuidString {
@@ -169,6 +174,12 @@ enum MobileDeviceApi {
     }
 
     static func registerPushToken(_ token: String) {
+        UserDefaults.standard.set(token, forKey: pushTokenKey)
+        setPushEnabled(UserDefaults.standard.bool(forKey: monitorKey))
+    }
+
+    static func setPushEnabled(_ enabled: Bool) {
+        guard let token = UserDefaults.standard.string(forKey: pushTokenKey) else { return }
         post(
             path: "/api/mobile-device-register",
             body: [
@@ -177,7 +188,7 @@ enum MobileDeviceApi {
                 "push_token": token,
                 "push_environment": pushEnvironment,
                 "app_version": appVersion,
-                "enabled": true
+                "enabled": enabled
             ]
         )
     }
@@ -213,7 +224,7 @@ enum MobileDeviceApi {
         request.httpBody = payload
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("CDLDriverHubIOS/0.3", forHTTPHeaderField: "User-Agent")
+        request.setValue("CDLDriverHubIOS/0.7", forHTTPHeaderField: "User-Agent")
 
         URLSession.shared.dataTask(with: request).resume()
     }
