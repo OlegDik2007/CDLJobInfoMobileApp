@@ -24,10 +24,10 @@ class CdlFirebaseMessagingService : FirebaseMessagingService() {
 
         val title = message.notification?.title
             ?: message.data["title"]
-            ?: getString(R.string.road_alert_nearby)
+            ?: NativeLanguage.t(this, "road_alert")
         val body = message.notification?.body
             ?: message.data["body"]
-            ?: getString(R.string.open_cdl_hub_details)
+            ?: NativeLanguage.t(this, "new_road_alert")
         val alertKey = message.data["alert_key"]
 
         if (!alertKey.isNullOrBlank()) {
@@ -44,10 +44,10 @@ class CdlFirebaseMessagingService : FirebaseMessagingService() {
         val manager = getSystemService(NotificationManager::class.java)
         val channel = NotificationChannel(
             ALERT_CHANNEL_ID,
-            getString(R.string.road_alerts_channel),
+            NativeLanguage.t(this, "alert_channel"),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = getString(R.string.road_alerts_channel_description)
+            description = NativeLanguage.t(this@CdlFirebaseMessagingService, "alert_description")
             enableVibration(true)
         }
         manager.createNotificationChannel(channel)
@@ -66,7 +66,7 @@ class CdlFirebaseMessagingService : FirebaseMessagingService() {
 
         val notification = android.app.Notification.Builder(this, ALERT_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_notify_error)
-            .setContentTitle(title)
+            .setContentTitle(NativeLanguage.labelTitle(this, title))
             .setContentText(body)
             .setStyle(android.app.Notification.BigTextStyle().bigText(body))
             .setAutoCancel(true)
