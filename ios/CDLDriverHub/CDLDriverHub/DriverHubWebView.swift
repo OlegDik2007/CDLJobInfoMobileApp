@@ -15,8 +15,7 @@ struct DriverHubWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        configuration.allowsInlineMediaPlayback = true
-        configuration.applicationNameForUserAgent = "CDLHubIOS/0.6 SwiftUI"
+        configuration.applicationNameForUserAgent = "CDLDriverHubIOS/0.7 SwiftUI"
 
         let controller = configuration.userContentController
         controller.add(context.coordinator, name: "cdlNative")
@@ -59,7 +58,7 @@ struct DriverHubWebView: UIViewRepresentable {
             ? URL(string: "https://cdljob.info/mobile-app/#alerts")!
             : appURL
 
-        webView.load(URLRequest(url: initialURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
+        webView.load(URLRequest(url: initialURL, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30))
         return webView
     }
 
@@ -93,7 +92,7 @@ struct DriverHubWebView: UIViewRepresentable {
 
         @objc private func openRoadAlerts() {
             UserDefaults.standard.set(false, forKey: "cdl_open_alerts")
-            webView?.load(URLRequest(url: URL(string: "https://cdljob.info/mobile-app/#alerts")!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
+            webView?.load(URLRequest(url: URL(string: "https://cdljob.info/mobile-app/#alerts")!))
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -103,6 +102,10 @@ struct DriverHubWebView: UIViewRepresentable {
 
             if type == "gpsRequested" {
                 locationPermission.requestRoadAlertTracking()
+            } else if type == "languageChanged",
+                      let language = payload["language"] as? String,
+                      ["en", "uk", "ru", "es", "uz"].contains(language) {
+                UserDefaults.standard.set(language, forKey: "cdl_mobile_language")
             }
         }
 
