@@ -2,6 +2,7 @@ package info.cdljob.driverhub
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -30,6 +31,8 @@ class MainActivity : Activity() {
         private const val LOCATION_REQUEST = 101
         private const val NOTIFICATION_REQUEST = 102
         private const val FILE_CHOOSER_REQUEST = 103
+        private const val BACKGROUND_LOCATION_REQUEST = 104
+        private const val MONITOR_PREF = "cdl_road_monitoring_enabled"
     }
 
     private lateinit var webView: WebView
@@ -89,6 +92,7 @@ class MainActivity : Activity() {
     }
 
     private fun startRoadTrackingIfAllowed() {
+        if (!getSharedPreferences("cdl_settings", MODE_PRIVATE).getBoolean(MONITOR_PREF, false)) return
         val fine = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val coarse = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!fine && !coarse) return
@@ -101,6 +105,46 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun enableRoadMonitoring() {
+        val fine = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarse = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!fine && !coarse) {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                BACKGROUND_LOCATION_REQUEST
+            )
+            return
+        }
+        getSharedPreferences("cdl_settings", MODE_PRIVATE).edit().putBoolean(MONITOR_PREF, true).apply()
+        startRoadTrackingIfAllowed()
+        Toast.makeText(this, NativeLanguage.t(this, "monitor_enabled"), Toast.LENGTH_LONG).show()
+    }
+
+    private fun requestRoadMonitoringConsent() {
+        AlertDialog.Builder(this)
+            .setTitle(NativeLanguage.t(this, "monitor_title"))
+            .setMessage(NativeLanguage.t(this, "monitor_consent"))
+            .setPositiveButton(NativeLanguage.t(this, "monitor_enable")) { _, _ -> enableRoadMonitoring() }
+            .setNegativeButton(NativeLanguage.t(this, "monitor_cancel"), null)
+            .show()
+    }
+
+    private inner class RoadMonitoringBridge {
+        @JavascriptInterface
+        fun start() = runOnUiThread { requestRoadMonitoringConsent() }
+
+        @JavascriptInterface
+        fun stop() = runOnUiThread {
+            getSharedPreferences("cdl_settings", MODE_PRIVATE).edit().putBoolean(MONITOR_PREF, false).apply()
+            stopService(Intent(this@MainActivity, RoadLocationService::class.java))
+            Toast.makeText(this@MainActivity, NativeLanguage.t(this@MainActivity, "monitor_disabled"), Toast.LENGTH_LONG).show()
+        }
+
+        @JavascriptInterface
+        fun isEnabled(): Boolean =
+            getSharedPreferences("cdl_settings", MODE_PRIVATE).getBoolean(MONITOR_PREF, false)
+    }
+
     private inner class LanguageBridge {
         @JavascriptInterface
         fun setLanguage(language: String) {
@@ -110,6 +154,7 @@ class MainActivity : Activity() {
 
     private fun configureWebView() {
         webView.addJavascriptInterface(LanguageBridge(), "CDLNativeLanguage")
+        webView.addJavascriptInterface(RoadMonitoringBridge(), "CDLRoadMonitoring")
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -117,7 +162,7 @@ class MainActivity : Activity() {
             loadWithOverviewMode = true
             useWideViewPort = true
             mediaPlaybackRequiresUserGesture = true
-            userAgentString = "$userAgentString CDLDriverHubAndroid/0.4.1 Kotlin"
+            userAgentString = "$userAgentString CDLDriverHubAndroid/0.7.0 Kotlin"
             cacheMode = WebSettings.LOAD_DEFAULT
         }
 
@@ -233,6 +278,13 @@ class MainActivity : Activity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == NOTIFICATION_REQUEST) {
+            return
+        }
+
+        if (requestCode == BACKGROUND_LOCATION_REQUEST) {
+            if (grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
+                enableRoadMonitoring()
+            }
             return
         }
 
