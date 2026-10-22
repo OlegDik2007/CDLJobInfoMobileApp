@@ -107,10 +107,10 @@ object RoadAlertChecker {
         manager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
-                "Road alerts",
+                NativeLanguage.t(context, "alert_channel"),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Crashes, closures, truck restrictions and severe road conditions nearby"
+                description = NativeLanguage.t(context, "alert_description")
                 enableVibration(true)
             }
         )
@@ -128,8 +128,8 @@ object RoadAlertChecker {
 
         val distanceText = distance?.let {
             val rounded = if (it < 10) String.format("%.1f", it) else it.toInt().toString()
-            rounded + " mi " + if (relation == "ahead") "ahead" else "away"
-        } ?: "nearby"
+            rounded + " " + NativeLanguage.t(context, "miles") + " " + NativeLanguage.t(context, if (relation == "ahead") "ahead" else "away")
+        } ?: NativeLanguage.t(context, "nearby")
 
         val title = buildString {
             append(icon)
@@ -143,7 +143,7 @@ object RoadAlertChecker {
 
         val body = item.optString("title")
             .ifBlank { item.optString("description") }
-            .ifBlank { "New road alert nearby. Open CDL Live Road for details." }
+            .ifBlank { NativeLanguage.t(context, "new_road_alert") }
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
