@@ -24,6 +24,25 @@ final class LocationPermissionManager: NSObject, ObservableObject, CLLocationMan
         resumeBackgroundTrackingIfAuthorized()
     }
 
+    func requestForegroundLocation() {
+        guard CLLocationManager.locationServicesEnabled() else { return }
+        switch manager.authorizationStatus {
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedAlways, .authorizedWhenInUse:
+            manager.requestLocation()
+        case .denied, .restricted:
+            break
+        @unknown default:
+            break
+        }
+    }
+
+    func stopRoadAlertTracking() {
+        UserDefaults.standard.set(false, forKey: backgroundTrackingKey)
+        manager.stopMonitoringSignificantLocationChanges()
+    }
+
     func requestRoadAlertTracking() {
         guard CLLocationManager.locationServicesEnabled() else { return }
 
