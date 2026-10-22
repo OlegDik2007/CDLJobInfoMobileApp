@@ -1,0 +1,31 @@
+name: Verify iOS release archive
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - '.github/workflows/archive-ios.yml'
+permissions:
+  contents: read
+jobs:
+  unsigned-device-archive:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ios/CDLDriverHub
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show Xcode version
+        run: xcodebuild -version
+      - name: Compile iOS release archive (not signed)
+        run: |
+          xcodebuild -project CDLDriverHub.xcodeproj \
+            -target CDLDriverHub \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/CDLDriverHub.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO archive
+      - name: Archive compilation succeeded
+        run: echo 'Release archive compiles. Production IPA requires Apple Developer signing and provisioning.'
