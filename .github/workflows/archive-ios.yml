@@ -21,7 +21,7 @@ jobs:
       - name: Compile iOS release archive (not signed)
         run: |
           xcodebuild -project CDLDriverHub.xcodeproj \
-            -target CDLDriverHub \
+            -scheme CDLDriverHub \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
