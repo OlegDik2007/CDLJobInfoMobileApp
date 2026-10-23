@@ -164,7 +164,7 @@ class MainActivity : Activity() {
             loadWithOverviewMode = true
             useWideViewPort = true
             mediaPlaybackRequiresUserGesture = true
-            userAgentString = "$userAgentString CDLDriverHubAndroid/0.7.0 Kotlin"
+            userAgentString = "$userAgentString CDLDriverHubAndroid/0.8.0 Kotlin"
             cacheMode = WebSettings.LOAD_DEFAULT
         }
 
