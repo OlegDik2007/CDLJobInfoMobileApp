@@ -49,6 +49,15 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |
           grep -F "versionName '$VERSION'" app/build.gradle >/dev/null || (echo 'Requested version differs from source' >&2; exit 1)
+      - name: Set up Python for branding assets
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Render matching Android production icon
+        run: |
+          python3 -m pip install --quiet cairosvg pillow
+          python3 ../branding/render_icons.py --platform android
+
       - name: Build signed release bundle and APK
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
