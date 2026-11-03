@@ -15,7 +15,7 @@ struct DriverHubWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        configuration.applicationNameForUserAgent = "CDLDriverHubIOS/0.7 SwiftUI"
+        configuration.applicationNameForUserAgent = "CDLDriverHubIOS/0.9 SwiftUI"
 
         let controller = configuration.userContentController
         controller.add(context.coordinator, name: "cdlNative")
