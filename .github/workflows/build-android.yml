@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'android/**'
+      - 'branding/**'
       - '.github/workflows/build-android.yml'
   workflow_dispatch:
 
@@ -38,6 +39,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.6.0'
+
+      - name: Install branded icon renderer
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Render branded CDL Hub Android launcher icon
+        run: |
+          python3 -m pip install --quiet cairosvg pillow
+          python3 ../branding/render_icons.py --platform android
+          file app/src/main/res/drawable/cdl_hub_launcher.png
 
       - name: Build debug APK
         env:
