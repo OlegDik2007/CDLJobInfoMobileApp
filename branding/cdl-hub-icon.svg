@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 512 512" role="img" aria-label="CDL Hub app icon: semi truck, highway, location pin">
+ <defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#103b68"/><stop offset=".53" stop-color="#06162d"/><stop offset="1" stop-color="#071b36"/></linearGradient>
+  <radialGradient id="glow" cx=".30" cy=".05" r=".90"><stop stop-color="#1383bb" stop-opacity=".5"/><stop offset="1" stop-color="#06213e" stop-opacity="0"/></radialGradient>
+  <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#75ecff"/><stop offset="1" stop-color="#058ed5"/></linearGradient>
+  <linearGradient id="truck" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".55" stop-color="#d6ecff"/><stop offset="1" stop-color="#88b8db"/></linearGradient>
+  <linearGradient id="pin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffb84e"/><stop offset=".55" stop-color="#ff851c"/><stop offset="1" stop-color="#f25416"/></linearGradient>
+  <clipPath id="rounded"><rect width="512" height="512" rx="98"/></clipPath>
+ </defs>
+ <g clip-path="url(#rounded)">
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <rect width="512" height="512" fill="url(#glow)"/>
+  <path d="M-8 365 C122 297 265 304 520 235 L520 520 L-8 520Z" fill="#031024" opacity=".46"/>
+  <path d="M68 186 L147 129 L215 182 L261 150 L324 195" fill="none" stroke="#53b9ee" stroke-width="10" opacity=".20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M-6 473 C91 410 177 396 279 420 S429 412 518 351" fill="none" stroke="#66d7ff" stroke-opacity=".30" stroke-width="24"/>
+  <path d="M-6 474 C91 415 183 401 279 423 S427 415 518 350" fill="none" stroke="#e8f6ff" stroke-width="9" stroke-linecap="round"/>
+  <path d="M234 510 C315 464 385 438 518 387" fill="none" stroke="#ff8f26" stroke-width="16" stroke-linecap="round"/>
+  <path d="M329 466 L358 452" stroke="#ffe4b0" stroke-width="7" stroke-linecap="round"/>
+  <path d="M406 437 L429 425" stroke="#ffe4b0" stroke-width="7" stroke-linecap="round"/>
+  <ellipse cx="247" cy="360" rx="182" ry="25" fill="#020914" opacity=".7"/>
+  <path d="M59 230 Q59 215 75 215 L250 215 Q265 215 265 233 L265 326 L59 326Z" fill="url(#truck)" stroke="#a6dcff" stroke-width="4"/>
+  <path d="M74 230 L250 230 L250 289 L74 289Z" fill="#cae7fc" opacity=".45"/>
+  <path d="M69 312 L264 312" stroke="#13628f" stroke-width="5"/>
+  <path d="M72 237 L245 237" stroke="#ffffff" stroke-opacity=".8" stroke-width="5"/>
+  <path d="M267 256 L282 235 Q291 226 307 226 L340 226 Q354 226 361 240 L379 273 L403 282 Q422 289 429 304 L429 326 L267 326Z" fill="url(#truck)" stroke="#a7dafa" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M300 238 L334 239 Q342 240 345 247 L358 273 L287 273Z" fill="#0a365a" stroke="#2d80b0" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M283 278 L363 278" stroke="#e8f7ff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M281 289 L414 289" stroke="#a8cce5" stroke-width="4"/>
+  <path d="M381 303 L413 307" stroke="#0b4872" stroke-width="6" stroke-linecap="round"/>
+  <path d="M411 294 L423 297" stroke="#ffc879" stroke-width="7" stroke-linecap="round"/>
+  <path d="M270 323 L431 323" stroke="#0b4c75" stroke-width="5"/>
+  <path d="M334 273 L334 318" stroke="#8bbddc" stroke-width="4"/>
+  <path d="M343 282 L353 282" stroke="#0e507b" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="117" cy="330" r="29" fill="#021328" stroke="#70c6f1" stroke-width="5"/>
+  <circle cx="117" cy="330" r="12" fill="#bfd9eb" stroke="#0d6494" stroke-width="5"/>
+  <circle cx="324" cy="330" r="29" fill="#021328" stroke="#70c6f1" stroke-width="5"/>
+  <circle cx="324" cy="330" r="12" fill="#bfd9eb" stroke="#0d6494" stroke-width="5"/>
+  <circle cx="387" cy="330" r="26" fill="#021328" stroke="#70c6f1" stroke-width="5"/>
+  <circle cx="387" cy="330" r="11" fill="#bfd9eb" stroke="#0d6494" stroke-width="5"/>
+  <path d="M383 61 C334 61 303 94 303 136 C303 169 339 211 383 259 C426 211 463 169 463 136 C463 94 431 61 383 61Z" fill="#021427" opacity=".50" transform="translate(4 7)"/>
+  <path d="M383 61 C334 61 303 94 303 136 C303 169 339 211 383 259 C426 211 463 169 463 136 C463 94 431 61 383 61Z" fill="url(#pin)" stroke="#ffd18b" stroke-width="4"/>
+  <circle cx="383" cy="135" r="27" fill="#08223e" stroke="#ffdfac" stroke-width="4"/>
+ </g>
+ <rect x="10" y="10" width="492" height="492" rx="89" fill="none" stroke="url(#cyan)" stroke-width="12"/>
+</svg>
