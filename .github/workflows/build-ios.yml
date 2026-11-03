@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'ios/**'
+      - 'branding/**'
       - '.github/workflows/build-ios.yml'
   workflow_dispatch:
 
@@ -24,6 +25,15 @@ jobs:
 
       - name: Show Xcode version
         run: xcodebuild -version
+
+      - name: Set up Python for shared branding
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Render CDL Hub AppIcon from shared artwork
+        run: |
+          python3 -m pip install --quiet cairosvg pillow
+          python3 ../../branding/render_icons.py --platform ios
 
       - name: Build iOS simulator app
         run: |
