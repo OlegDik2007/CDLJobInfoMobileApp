@@ -47,7 +47,7 @@ jobs:
 
       - name: Render branded CDL Hub Android launcher icon
         run: |
-          python3 -m pip install --quiet cairosvg pillow
+          python3 -m pip install --quiet pillow
           python3 ../branding/render_icons.py --platform android
           file app/src/main/res/drawable/cdl_hub_launcher.png
 
