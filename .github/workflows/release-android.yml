@@ -55,7 +55,7 @@ jobs:
           python-version: '3.12'
       - name: Render matching Android production icon
         run: |
-          python3 -m pip install --quiet cairosvg pillow
+          python3 -m pip install --quiet pillow
           python3 ../branding/render_icons.py --platform android
 
       - name: Build signed release bundle and APK
