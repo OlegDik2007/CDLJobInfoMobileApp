@@ -1,75 +1,67 @@
 #!/usr/bin/env python3
-"""Build Android and iOS launcher icons from one version-controlled SVG brand source.
+"""Render the user-approved CDL Hub icon for Android and iOS.
 
-Run before a release build:
-  python3 -m pip install cairosvg Pillow
-  python3 branding/render_icons.py --platform android
-  python3 branding/render_icons.py --platform ios
-
-The Android XML icon is a local-build fallback. CI replaces it with a rendered PNG
-in its ephemeral checkout; no binary GitHub upload is required.
+The approved source is a small image received in the conversation and stored
+without URL dependencies as a base64 WebP in this repository. Resampling it to
+required platform sizes preserves the *approved design*, rather than inventing
+a different SVG logo. For store-quality 1024 px assets, a high-resolution
+original of this exact design is strongly recommended.
 """
 from __future__ import annotations
 
 import argparse
+import base64
 import io
 from pathlib import Path
 
-import cairosvg
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "branding" / "cdl-hub-icon.svg"
+SOURCE = ROOT / "branding" / "approved-cdl-hub-icon.webp.b64"
 
 
 def rasterize(size: int, *, transparent: bool) -> Image.Image:
-    raw = cairosvg.svg2png(
-        url=str(SOURCE),
-        output_width=size,
-        output_height=size,
-    )
-    image = Image.open(io.BytesIO(raw)).convert("RGBA")
+    payload = base64.b64decode(SOURCE.read_text().strip(), validate=True)
+    icon = Image.open(io.BytesIO(payload)).convert("RGBA")
+    if icon.size != (83, 81):
+        raise ValueError("Unexpected approved-icon source dimensions")
+    scaled = ImageOps.contain(icon, (size, size), Image.Resampling.LANCZOS)
     if transparent:
-        return image
-    # Apple rejects alpha channels in marketing App Store icons.
-    background = Image.new("RGB", image.size, "#07162b")
-    background.paste(image, (0, 0), image.getchannel("A"))
-    return background
+        canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        canvas.paste(scaled, ((size - scaled.width)//2, (size - scaled.height)//2), scaled)
+    else:
+        # Apple app icons must be opaque, including transparent source corners.
+        canvas = Image.new("RGB", (size, size), "#07162b")
+        canvas.paste(scaled, ((size - scaled.width)//2, (size - scaled.height)//2), scaled)
+    return canvas
 
 
 def render_android() -> None:
-    directory = ROOT / "android" / "app" / "src" / "main" / "res" / "drawable"
+    directory = ROOT / "android/app/src/main/res/drawable"
     directory.mkdir(parents=True, exist_ok=True)
-    fallback_vector = directory / "cdl_hub_launcher.xml"
-    fallback_vector.unlink(missing_ok=True)
-    output = directory / "cdl_hub_launcher.png"
-    rasterize(512, transparent=True).save(output, optimize=True)
-    print(f"Android: {output} ({output.stat().st_size:,} bytes)")
+    # Android must use the approved PNG, not the older SVG vector fallback.
+    (directory / "cdl_hub_launcher.xml").unlink(missing_ok=True)
+    target = directory / "cdl_hub_launcher.png"
+    rasterize(512, transparent=True).save(target, optimize=True)
+    print(f"Android approved launcher: {target} ({target.stat().st_size} bytes)")
 
 
 def render_ios() -> None:
-    directory = (
-        ROOT / "ios" / "CDLDriverHub" / "CDLDriverHub"
-        / "Assets.xcassets" / "AppIcon.appiconset"
-    )
+    directory = ROOT / "ios/CDLDriverHub/CDLDriverHub/Assets.xcassets/AppIcon.appiconset"
     directory.mkdir(parents=True, exist_ok=True)
     for size, name in [
         (120, "Icon-60@2x.png"),
         (180, "Icon-60@3x.png"),
         (1024, "AppIcon-1024.png"),
     ]:
-        output = directory / name
-        rasterize(size, transparent=False).save(output, optimize=True)
-        print(f"iOS: {output} ({output.stat().st_size:,} bytes)")
+        target = directory / name
+        rasterize(size, transparent=False).save(target, optimize=True)
+        print(f"iOS approved launcher: {target} ({target.stat().st_size} bytes)")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Render CDL Hub icons from SVG")
-    parser.add_argument(
-        "--platform",
-        choices=("android", "ios", "all"),
-        default="all",
-    )
+    parser = argparse.ArgumentParser(description="Render approved CDL Hub icons")
+    parser.add_argument("--platform", choices=("android","ios","all"), default="all")
     args = parser.parse_args()
     if args.platform in ("android", "all"):
         render_android()
