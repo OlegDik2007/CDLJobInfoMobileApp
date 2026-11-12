@@ -3,7 +3,7 @@
 ## Recommended public naming
 
 - **Brand:** CDL Hub
-- **App Store / Google Play title:** **CDL Hub: Weather & Cameras** (27 characters; proposed store listing title, subject to store-name availability and trademark review)
+- **App Store / Google Play title:** **CDL Hub: Weather & Cameras** (26 characters; proposed store listing title, subject to store-name availability and trademark review)
 - **Phone launcher label:** **CDL Hub** (intentionally short, avoids truncation)
 - **Tagline:** **Truckers' Road Intelligence**
 - **Description:** Official traffic cameras, road weather conditions and warnings, real-time road alerts, fuel stations, CDL jobs and driver community tools in one app
