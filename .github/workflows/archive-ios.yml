@@ -23,9 +23,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Render CDL Hub release AppIcon from shared SVG
+      - name: Render CDL Hub release AppIcon from approved image
         run: |
-          python3 -m pip install --quiet cairosvg pillow
+          python3 -m pip install --quiet pillow
           python3 ../../branding/render_icons.py --platform ios
 
       - name: Compile iOS release archive (not signed)
