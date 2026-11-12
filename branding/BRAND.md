@@ -13,7 +13,7 @@ Keep the app IDs unchanged: Android `info.cdljob.driverhub`, iOS `info.cdljob.dr
 
 ## Brand icon
 
-Authoritative source: `branding/cdl-hub-icon.svg`.
+Approved image source: `branding/approved-cdl-hub-icon.webp.b64` (small user-selected icon, optimized for version control).\nThe older vector `branding/cdl-hub-icon.svg` is NOT the selected brand and is not rendered in CI.
 
 Distinctive elements:
 - Navy highway backdrop
@@ -21,12 +21,12 @@ Distinctive elements:
 - Orange location pin
 - Cyan frame and curved road
 
-All icons are derived from the same vector source by `branding/render_icons.py`.
+All icons are derived from the same approved source image by `branding/render_icons.py`.
 
 To regenerate:
 
 ```sh
-python3 -m pip install cairosvg pillow
+python3 -m pip install pillow
 python3 branding/render_icons.py --platform all
 ```
 
