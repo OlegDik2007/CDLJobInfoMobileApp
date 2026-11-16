@@ -11,6 +11,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.view.Menu
+import android.view.MenuItem
 import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -28,6 +30,7 @@ class MainActivity : Activity() {
 
     companion object {
         private const val APP_URL = "https://cdljob.info/mobile-app/"
+        private const val NEWS_URL = "https://cdljob.info/news.html"
         private const val LOCATION_REQUEST = 101
         private const val NOTIFICATION_REQUEST = 102
         private const val FILE_CHOOSER_REQUEST = 103
@@ -63,6 +66,24 @@ class MainActivity : Activity() {
         } else {
             webView.restoreState(savedInstanceState)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menu.add(0, 2001, 0, "News & Fuel").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, 2002, 1, "Road Hub")
+        menu.add(0, 2003, 2, "Driver Health")
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val destination = when (item.itemId) {
+            2001 -> NEWS_URL
+            2002 -> APP_URL
+            2003 -> "https://cdljob.info/driver-health.html"
+            else -> return super.onOptionsItemSelected(item)
+        }
+        webView.loadUrl(destination)
+        return true
     }
 
     private fun shouldOpenAlerts(intent: Intent?): Boolean {
