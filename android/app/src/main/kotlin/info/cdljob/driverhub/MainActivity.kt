@@ -79,7 +79,7 @@ class MainActivity : Activity() {
         val destination = when (item.itemId) {
             2001 -> NEWS_URL
             2002 -> APP_URL
-            2003 -> "https://cdljob.info/driver-health.html"
+            2003 -> "https://cdljob.info/health.html"
             else -> return super.onOptionsItemSelected(item)
         }
         webView.loadUrl(destination)
