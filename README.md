@@ -4,8 +4,8 @@ Native mobile apps for CDL Hub.
 
 ## Apps
 
-- **Android 0.3.2** — Kotlin + Android WebView
-- **iOS 0.3.0** — Swift + SwiftUI + WKWebView
+- **Android 0.9.1** — Kotlin + Android WebView
+- **iOS 0.9.0** — Swift + SwiftUI + WKWebView
 - Shared live UI: https://cdljob.info/mobile-app/
 - Shared backend/APIs: https://cdljob.info
 
@@ -39,3 +39,11 @@ Example:
 > 🚨 Crash 4 mi ahead — I-80
 
 Android uses a foreground location service while road monitoring is active. iOS uses Apple's lower-power significant-location-change monitoring when the user grants Always Location access.
+
+## Website / mobile synchronization (2026-11-17)
+
+- Android and iOS load the current `https://cdljob.info/mobile-app/` UI, which includes the internal News feed under More → News and supports five UI languages.
+- Road incidents, DOT/511 cameras, NWS weather coverage, winter observations, GPS nearby feeds, fuel data, chat, jobs and reviews are supplied by the shared Driver_portal API. Website backend ingestion and freshness updates take effect without copying server code into native projects.
+- Android 0.9.1 points the native News menu at `/mobile-app/#newsSec` and Driver Health at `/mobile-app/#healthSec`, instead of opening the desktop-oriented web pages. Background API user-agent strings now match the Android build.
+- iOS uses the same in-app News and Health destinations through its existing shared mobile interface. Its native source has not required changes for these backend updates.
+- New APKs are required for native Android changes; web UI updates generally do not require reinstalling either client. Production signing, push activation, rights review and real-device QA remain prerequisites for store releases.
