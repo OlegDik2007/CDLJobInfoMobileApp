@@ -41,7 +41,7 @@ object RoadAlertChecker {
                     connectTimeout = 10_000
                     readTimeout = 10_000
                     setRequestProperty("Accept", "application/json")
-                    setRequestProperty("User-Agent", "CDLDriverHubAndroid/0.3.1")
+                    setRequestProperty("User-Agent", "CDLDriverHubAndroid/0.9.1")
                 }
 
                 val response = try {
