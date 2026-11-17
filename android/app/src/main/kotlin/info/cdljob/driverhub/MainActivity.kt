@@ -30,7 +30,7 @@ class MainActivity : Activity() {
 
     companion object {
         private const val APP_URL = "https://cdljob.info/mobile-app/"
-        private const val NEWS_URL = "${APP_URL}#newsSec"
+        private const val NEWS_URL = "https://cdljob.info/mobile-app/#newsSec"
         private const val LOCATION_REQUEST = 101
         private const val NOTIFICATION_REQUEST = 102
         private const val FILE_CHOOSER_REQUEST = 103
