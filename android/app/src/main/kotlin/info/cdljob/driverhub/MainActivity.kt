@@ -30,7 +30,7 @@ class MainActivity : Activity() {
 
     companion object {
         private const val APP_URL = "https://cdljob.info/mobile-app/"
-        private const val NEWS_URL = "https://cdljob.info/news.html"
+        private const val NEWS_URL = "${APP_URL}#newsSec"
         private const val LOCATION_REQUEST = 101
         private const val NOTIFICATION_REQUEST = 102
         private const val FILE_CHOOSER_REQUEST = 103
@@ -69,7 +69,7 @@ class MainActivity : Activity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add(0, 2001, 0, "News & Fuel").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, 2001, 0, "News").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         menu.add(0, 2002, 1, "Road Hub")
         menu.add(0, 2003, 2, "Driver Health")
         return true
@@ -79,7 +79,7 @@ class MainActivity : Activity() {
         val destination = when (item.itemId) {
             2001 -> NEWS_URL
             2002 -> APP_URL
-            2003 -> "https://cdljob.info/health.html"
+            2003 -> "${APP_URL}#healthSec"
             else -> return super.onOptionsItemSelected(item)
         }
         webView.loadUrl(destination)
@@ -185,7 +185,7 @@ class MainActivity : Activity() {
             loadWithOverviewMode = true
             useWideViewPort = true
             mediaPlaybackRequiresUserGesture = true
-            userAgentString = "$userAgentString CDLDriverHubAndroid/0.9.0 Kotlin"
+            userAgentString = "$userAgentString CDLDriverHubAndroid/0.9.1 Kotlin"
             cacheMode = WebSettings.LOAD_DEFAULT
         }
 
