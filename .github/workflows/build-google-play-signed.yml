@@ -112,15 +112,32 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.CDL_PLAY_UPLOAD_KEY_PASSWORD }}
         run: gradle --no-daemon :app:bundleRelease
 
-      - name: Verify bundle and cryptographic signature
+      - name: Verify bundle and upload-key certificate
+        env:
+          CDL_PLAY_UPLOAD_STORE_PASSWORD: ${{ secrets.CDL_PLAY_UPLOAD_STORE_PASSWORD }}
+          CDL_PLAY_UPLOAD_KEY_ALIAS: ${{ secrets.CDL_PLAY_UPLOAD_KEY_ALIAS }}
         run: |
           set -euo pipefail
           BUNDLE="app/build/outputs/bundle/release/app-release.aab"
           test -s "$BUNDLE"
           unzip -t "$BUNDLE" > /dev/null
-          jarsigner -verify -strict "$BUNDLE" > /dev/null
+          # Upload certificates are self-signed; jarsigner -strict rejects
+          # such certificates even when the bundle is valid for Google Play.
+          VERIFY_OUTPUT="$(jarsigner -verify "$BUNDLE" 2>&1)"
+          if ! grep -q '^jar verified\.' <<< "$VERIFY_OUTPUT"; then
+            echo "::error::AAB is not a verified signed archive"
+            exit 1
+          fi
+          EXPECTED_FP="$(keytool -list -v -keystore "$ANDROID_KEYSTORE_PATH" \
+            -storepass "$CDL_PLAY_UPLOAD_STORE_PASSWORD" \
+            -alias "$CDL_PLAY_UPLOAD_KEY_ALIAS" | awk '/SHA256:/{print $2; exit}')"
+          ACTUAL_FP="$(keytool -printcert -jarfile "$BUNDLE" | awk '/SHA256:/{print $2; exit}')"
+          if [[ -z "$EXPECTED_FP" || "$EXPECTED_FP" != "$ACTUAL_FP" ]]; then
+            echo "::error::AAB signer does not match the intended upload key"
+            exit 1
+          fi
           echo "### CDL Hub signed internal-test candidate (versionCode 12)" >> "$GITHUB_STEP_SUMMARY"
-          echo "Signed AAB signature and zip integrity verified; check package in Play Console before upload" >> "$GITHUB_STEP_SUMMARY"
+          echo "AAB cryptographic signature matches the upload key; confirm package in Play Console before upload" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload signed bundle as artifact (not a store submission)
         uses: actions/upload-artifact@v4
