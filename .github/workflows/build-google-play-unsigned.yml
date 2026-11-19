@@ -1,0 +1,96 @@
+name: Validate CDL Hub Google Play bundle
+
+on:
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'branding/**'
+      - '.github/workflows/build-google-play-unsigned.yml'
+      - '.github/workflows/build-google-play-signed.yml'
+      - 'docs/GOOGLE-PLAY-INTERNAL-TESTING.md'
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'branding/**'
+      - '.github/workflows/build-google-play-unsigned.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unsigned-aab-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate release identity and key security
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          gradle=Path("app/build.gradle").read_text()
+          manifest=Path("app/src/main/AndroidManifest.xml").read_text()
+          expected={
+            "applicationId": r"applicationId\s+['\"]info\.cdljob\.driverhub['\"]",
+            "versionCode": r"versionCode\s+12\b",
+            "versionName": r"versionName\s+['\"]1\.0\.0-rc1['\"]",
+            "targetSdk": r"targetSdk\s+36\b",
+          }
+          for name, pattern in expected.items():
+            assert re.search(pattern,gradle), "Invalid Android "+name
+          assert 'android:allowBackup="false"' in manifest
+          assert 'android:foregroundServiceType="location"' in manifest
+          assert 'android.permission.ACCESS_BACKGROUND_LOCATION' not in manifest
+          assert 'android:usesCleartextTraffic="false"' in manifest
+          assert "System.getenv('ANDROID_KEYSTORE_PATH')" in gradle
+          print("PASS: package/version/API36/location/backup/signing contract")
+          PY
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK 36
+        run: |
+          SDKMANAGER="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Render existing CDL Hub icon
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 ../branding/render_icons.py --platform android
+
+      - name: Build unsigned release AAB (not uploadable)
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_APPLICATION_ID: ${{ secrets.FIREBASE_APPLICATION_ID }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_GCM_SENDER_ID: ${{ secrets.FIREBASE_GCM_SENDER_ID }}
+        run: |
+          gradle --no-daemon :app:bundleRelease
+          test -s app/build/outputs/bundle/release/app-release.aab
+          echo "Unsigned release candidate compiled. Never upload this artifact to Play Console."
+
+      - name: Upload review-only unsigned bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: CDLHub-v12-UNSIGNED-DO-NOT-PUBLISH
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 5
+          if-no-files-found: error
