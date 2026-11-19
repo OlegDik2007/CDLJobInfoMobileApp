@@ -110,7 +110,7 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.CDL_PLAY_UPLOAD_STORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.CDL_PLAY_UPLOAD_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.CDL_PLAY_UPLOAD_KEY_PASSWORD }}
-        run: gradle --no-daemon :app:bundleRelease
+        run: bash ./ci-build-release.sh
 
       - name: Verify bundle and upload-key certificate
         env:
