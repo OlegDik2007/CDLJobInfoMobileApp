@@ -112,7 +112,7 @@ jobs:
           gradle --no-daemon :app:bundleRelease
           BUNDLE="app/build/outputs/bundle/release/app-release.aab"
           VERIFY_OUTPUT="$(jarsigner -verify "$BUNDLE" 2>&1)"
-          grep -q '^jar verified\\.' <<< "$VERIFY_OUTPUT"
+          grep -q '^jar verified\.' <<< "$VERIFY_OUTPUT"
           EXPECTED_FP="$(keytool -list -v -keystore "$TEMP_KEY" \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" \
             | awk '/SHA256:/{print $2; exit}')"
