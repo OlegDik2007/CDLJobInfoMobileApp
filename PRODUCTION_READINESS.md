@@ -4,7 +4,7 @@
 
 - Mobile code: `OlegDik2007/CDLJobInfoMobileApp`.
 - Website and API code: `OlegDik2007/Driver_portal`, live at `https://cdljob.info`.
-- Current release candidate: Android 0.7.0 (`versionCode 8`), iOS 0.7.0 (`CFBundleVersion 7`).
+- Current code versions: Android 0.9.1 (`versionCode 11`), iOS 0.9.0 (`CFBundleVersion 9`). Store release is not approved.
 - Both apps render `/mobile-app/` and share live road/camera/weather/fuel/chat APIs.
 - Five languages in mobile web UI: en, uk, ru, es, uz. Road names, original third-party camera footage, official source content, and map base labels are not machine-translated.
 - Camera catalog, road events, winter alerts, images, and video are subject to source-specific permissions. Newly discovered permission-gated sources must remain disabled until authorized.
@@ -34,10 +34,19 @@
 - Added 24-hour chat pruning and stale mobile GPS cleanup with a protected scheduled endpoint.
 - Added chat user blocking, abuse reporting and authenticated moderation endpoint; chat image service now strips EXIF and GPS metadata on upload and supports authenticated deletion.
 
+## 2026-11-18 native fixes (pending PR review and CI)
+
+- iOS: added APNs entitlements for Debug/development and Release/production; signed device delivery still requires Apple developer capabilities, matching provisioning, backend credentials and hardware testing.
+- iOS: included a privacy manifest declaring the `UserDefaults` required-reason API and fixed the API User-Agent to use the bundle version; corrected iPhone-only documentation.
+- Android: added a visible native toolbar so News, Road Hub and Driver Health menu items are accessible. Translated these options and the photo chooser into five supported native languages.
+- Android: switched opted-in location foreground service to `START_NOT_STICKY` and guarded start failures. This avoids silent background restarts on Android 14+ without `ACCESS_BACKGROUND_LOCATION`; tracking can stop when Android kills the service and resumes when the app is reopened. Test on physical devices.
+- Android and iOS: build workflows now run on pull requests so changes are checked before merging. Green CI is not equivalent to release sign-off.
+- August/older events in the live road feed still require a separate backend freshness audit; native-only changes do not repair server-side data.
+
 ## **Not cleared for public App Store / Google Play submission yet**
 
-1. **Store signing:** configure Android upload keystore and GitHub Actions secrets; configure Apple Developer Team, signing certificate, provisioning, bundle ID, and APNs capability. An unsigned iOS device archive and Android debug build are not store distributions.
-2. **Push provider activation:** configure FCM service account on the backend and Firebase client config at build time, plus APNs signing credentials and entitlements. Do end-to-end real-device push tests while the app is backgrounded.
+1. **Store signing:** configure Android upload keystore and GitHub Actions secrets; configure Apple Developer Team, signing certificate, provisioning, bundle ID, and APNs capability. APNs entitlements exist in source but must be authorized by matching provisioning. An unsigned iOS device archive and Android debug build are not store distributions.
+2. **Push provider activation:** configure FCM service account on the backend and Firebase client config at build time, plus APNs signing credentials. Source entitlements alone do not prove working push. Do end-to-end real-device push tests while the app is backgrounded.
 3. **Identity and abuse protection:** mobile telemetry and anonymous chat APIs use client-provided device IDs. Before scaling to untrusted public users, add installation-scoped authenticated tokens, IP/device rate limits and abuse controls; do not treat anonymous IDs as verified identities.
 4. **Chat moderation operations:** appoint moderators to review incoming reports promptly, document escalation/removal standards, and verify objectionable text and image filtering. Report/block features alone do not demonstrate an operational moderation process.
 5. **Real-device QA:** test 5 locales on both platforms, Wi-Fi/cellular/offline, location denied/granted, foreground-background-reopened, force-stop behavior, camera picker, video playback, chat photo deletion, expired alerts, GPS state fallback, iOS APNs production environment, Android target SDK, accessibility and battery usage.

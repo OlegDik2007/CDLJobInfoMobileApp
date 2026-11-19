@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -59,7 +60,14 @@ class RoadLocationService : Service() {
         super.onCreate()
         firebaseConfigured = FirebaseBootstrap.initialize(this)
         fusedLocation = LocationServices.getFusedLocationProviderClient(this)
-        startForeground(SERVICE_NOTIFICATION_ID, trackingNotification())
+        try {
+            startForeground(SERVICE_NOTIFICATION_ID, trackingNotification())
+        } catch (error: RuntimeException) {
+            // A background restart cannot satisfy Android 14+ while-in-use location requirements.
+            Log.w("CDLHub", "Road tracking foreground start rejected", error)
+            stopSelf()
+            return
+        }
         requestLocationUpdates()
     }
 
@@ -113,7 +121,9 @@ class RoadLocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
+        // Never silently recreate a location FGS from the background.
+        // On the next visible launch, MainActivity resumes an opted-in session.
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
