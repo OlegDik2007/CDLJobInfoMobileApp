@@ -224,7 +224,7 @@ enum MobileDeviceApi {
         request.httpBody = payload
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("CDLDriverHubIOS/0.7", forHTTPHeaderField: "User-Agent")
+        request.setValue("CDLDriverHubIOS/\(appVersion)", forHTTPHeaderField: "User-Agent")
 
         URLSession.shared.dataTask(with: request).resume()
     }
