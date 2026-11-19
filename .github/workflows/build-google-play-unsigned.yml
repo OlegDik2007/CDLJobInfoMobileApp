@@ -37,7 +37,7 @@ jobs:
           gradle=Path("app/build.gradle").read_text()
           manifest=Path("app/src/main/AndroidManifest.xml").read_text()
           expected={
-            "applicationId": r"applicationId\s+['\"]info\.cdljob\.driverhub['\"]",
+            "applicationId": r"applicationId\s+['\"]com\.avidetechnologies\.cdlroadhub['\"]",
             "versionCode": r"versionCode\s+12\b",
             "versionName": r"versionName\s+['\"]1\.0\.0-rc1['\"]",
             "targetSdk": r"targetSdk\s+36\b",
