@@ -94,3 +94,31 @@ jobs:
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 5
           if-no-files-found: error
+      - name: Smoke-test release signing with disposable CI key (never upload)
+        run: |
+          set -euo pipefail
+          umask 077
+          TEMP_KEY="$RUNNER_TEMP/cdl-hub-CI-ONLY.p12"
+          trap 'rm -f "$TEMP_KEY"' EXIT
+          export ANDROID_KEYSTORE_PATH="$TEMP_KEY"
+          export ANDROID_KEYSTORE_PASSWORD="CI-only-disposable-key-not-for-release"
+          export ANDROID_KEY_ALIAS="ci-temporary-signing-test"
+          export ANDROID_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
+          keytool -genkeypair -storetype PKCS12 \
+            -keystore "$TEMP_KEY" -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -keypass "$ANDROID_KEY_PASSWORD" -alias "$ANDROID_KEY_ALIAS" \
+            -keyalg RSA -keysize 2048 -validity 30 \
+            -dname "CN=CDL Hub Temporary CI Test, O=CI Only" > /dev/null 2>&1
+          gradle --no-daemon :app:bundleRelease
+          BUNDLE="app/build/outputs/bundle/release/app-release.aab"
+          VERIFY_OUTPUT="$(jarsigner -verify "$BUNDLE" 2>&1)"
+          grep -q '^jar verified\\.' <<< "$VERIFY_OUTPUT"
+          EXPECTED_FP="$(keytool -list -v -keystore "$TEMP_KEY" \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" \
+            | awk '/SHA256:/{print $2; exit}')"
+          ACTUAL_FP="$(keytool -printcert -jarfile "$BUNDLE" \
+            | awk '/SHA256:/{print $2; exit}')"
+          test -n "$EXPECTED_FP"
+          test "$EXPECTED_FP" = "$ACTUAL_FP"
+          rm -f "$BUNDLE"
+          echo "PASS: ephemeral signing path and expected certificate fingerprint"
