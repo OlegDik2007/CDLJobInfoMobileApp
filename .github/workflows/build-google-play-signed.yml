@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       package_confirmation:
-        description: "Confirm existing Play Console package by typing info.cdljob.driverhub"
+        description: "Confirm existing Play Console package by typing com.avidetechnologies.cdlroadhub"
         required: true
         type: string
 
@@ -41,10 +41,15 @@ jobs:
           CDL_PLAY_UPLOAD_KEY_PASSWORD: ${{ secrets.CDL_PLAY_UPLOAD_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          if [[ "$PACKAGE_CONFIRMATION" != "info.cdljob.driverhub" ]]; then
+          if [[ "$PACKAGE_CONFIRMATION" != "com.avidetechnologies.cdlroadhub" ]]; then
             echo "::error::Confirm the existing Play Console applicationId before signing"
             exit 1
           fi
+          # Prevent signing a bundle with a different package from the draft.
+          grep -Fq "applicationId 'com.avidetechnologies.cdlroadhub'" app/build.gradle || {
+            echo "::error::Android Gradle applicationId differs from the existing Play Console app"
+            exit 1
+          }
           missing=0
           for key in FIREBASE_PROJECT_ID FIREBASE_APPLICATION_ID FIREBASE_API_KEY FIREBASE_GCM_SENDER_ID \
                      CDL_PLAY_UPLOAD_KEYSTORE_BASE64 CDL_PLAY_UPLOAD_STORE_PASSWORD \
