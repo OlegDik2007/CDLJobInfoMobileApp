@@ -11,6 +11,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Official Maven Central alternate hostname for intermittent runner/CDN misses.
+        maven { url 'https://repo1.maven.org/maven2' }
     }
 }
 

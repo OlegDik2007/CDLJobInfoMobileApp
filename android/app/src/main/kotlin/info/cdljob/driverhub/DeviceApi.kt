@@ -97,7 +97,7 @@ object DeviceApi {
                     doOutput = true
                     setRequestProperty("Content-Type", "application/json")
                     setRequestProperty("Accept", "application/json")
-                    setRequestProperty("User-Agent", "CDLDriverHubAndroid/0.9.1")
+                    setRequestProperty("User-Agent", "CDLHubAndroid/" + BuildConfig.VERSION_NAME)
                 }
 
                 connection.outputStream.use {

@@ -4,7 +4,7 @@ Native mobile apps for CDL Hub.
 
 ## Apps
 
-- **Android 0.9.1** — Kotlin + Android WebView
+- **Android 1.0.0-rc1 (versionCode 12)** — Kotlin + Android WebView; Google Play Internal Testing candidate only
 - **iOS 0.9.0** — Swift + SwiftUI + WKWebView
 - Shared live UI: https://cdljob.info/mobile-app/
 - Shared backend/APIs: https://cdljob.info
@@ -21,6 +21,12 @@ Native mobile apps for CDL Hub.
   - Android: Firebase Cloud Messaging (FCM)
   - iOS: Apple Push Notification service (APNs)
 - Jobs and company reviews as secondary features
+
+## Google Play release
+
+- Canonical signed Android AAB release work is in this repository, **not** the backend repo's legacy mobile copy.
+- For signing, Google Play policy declarations, testers and QA, see [Internal Testing Release Gate](docs/GOOGLE-PLAY-INTERNAL-TESTING.md).
+- The GitHub workflows distinguish developer debug APK, unsigned release verification and manually triggered signed AAB. A successful source build does not mean the app is published.
 
 ## Repository structure
 
