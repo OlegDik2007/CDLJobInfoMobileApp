@@ -11,7 +11,7 @@ Updated 2026-11-19. **This is preparation, not authorization to publish.**
 
 ## CI workflow division
 - `build-android.yml`: debug APK for developers, never upload to Play.
-- `build-google-play-unsigned.yml`: PR compile/release preflight for an unsigned **NON-PUBLISHABLE** AAB. It checks the package ID, build version, cleartext traffic ban, nonbackup config, GPS service type, and lack of `ACCESS_BACKGROUND_LOCATION`.
+- `build-google-play-unsigned.yml`: PR compile/release preflight for an unsigned **NON-PUBLISHABLE** AAB, plus a separately built **disposable test-key-signed AAB that is not uploaded**. It checks the package ID, build version, cleartext traffic ban, nonbackup config, GPS service type, and lack of `ACCESS_BACKGROUND_LOCATION`.
 - `build-google-play-signed.yml`: trusted `main` only, manually dispatched. It checks the package string typed by the operator, required secrets, validates the upload keystore, builds the signed AAB, and verifies the signature. **It does not submit anything to Google Play.**
 
 ## Credentials and signing
@@ -30,7 +30,7 @@ Updated 2026-11-19. **This is preparation, not authorization to publish.**
 
 If an upload key already exists in Play Console, **reuse it**. Creating a new key without following Play's upload-key reset process may prevent app updates. Back up any new upload key offline. Firebase **server** credentials stay exclusively in the backend.
 
-The signed workflow maps the `CDL_PLAY_*` secrets to Gradle's existing `ANDROID_KEYSTORE_*` environment configuration and verifies `jarsigner -verify -strict`. An unsigned or debug bundle is **not** a store candidate.
+The signed workflow maps the `CDL_PLAY_*` secrets to Gradle's existing `ANDROID_KEYSTORE_*` environment configuration and verifies the `jarsigner -verify` result and checks the AAB signer's SHA-256 certificate fingerprint against the intended upload keystore. An unsigned or debug bundle is **not** a store candidate.
 
 ## Store listing and policy gates
 1. Verify Google Play developer account and the package name `info.cdljob.driverhub`.
