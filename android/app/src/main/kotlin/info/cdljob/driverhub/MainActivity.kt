@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.view.ContextThemeWrapper
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.GeolocationPermissions
@@ -22,6 +23,9 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import android.widget.LinearLayout
+import android.widget.Toolbar
+import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
 import androidx.core.content.FileProvider
 import java.io.File
@@ -54,7 +58,20 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(7, 17, 31))
             overScrollMode = View.OVER_SCROLL_NEVER
         }
-        setContentView(webView)
+        // A real native toolbar exposes News and the overflow options under NoActionBar.
+        val toolbar = Toolbar(ContextThemeWrapper(this, android.R.style.ThemeOverlay_Material_Dark_ActionBar)).apply {
+            title = getString(R.string.app_name)
+            setTitleTextColor(Color.WHITE)
+            setBackgroundColor(Color.rgb(7, 17, 31))
+        }
+        val toolbarHeight = (52 * resources.displayMetrics.density).toInt()
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(toolbar, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, toolbarHeight))
+            addView(webView, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+        }
+        setContentView(container)
+        setActionBar(toolbar)
 
         configureWebView()
         initializePush()
@@ -69,9 +86,9 @@ class MainActivity : Activity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add(0, 2001, 0, "News").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        menu.add(0, 2002, 1, "Road Hub")
-        menu.add(0, 2003, 2, "Driver Health")
+        menu.add(0, 2001, 0, NativeLanguage.t(this, "menu_news")).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, 2002, 1, NativeLanguage.t(this, "menu_road_hub"))
+        menu.add(0, 2003, 2, NativeLanguage.t(this, "menu_driver_health"))
         return true
     }
 
@@ -119,10 +136,18 @@ class MainActivity : Activity() {
         if (!fine && !coarse) return
 
         val intent = Intent(this, RoadLocationService::class.java)
-        if (Build.VERSION.SDK_INT >= 26) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
+        try {
+            if (Build.VERSION.SDK_INT >= 26) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+        } catch (error: RuntimeException) {
+            // Android 12+ can reject a foreground-service launch outside the eligible window.
+            Log.w("CDLHub", "Road tracking could not start", error)
+            getSharedPreferences("cdl_settings", MODE_PRIVATE).edit().putBoolean(MONITOR_PREF, false).apply()
+            DeviceApi.setNotificationsEnabled(this, false)
+            Toast.makeText(this, NativeLanguage.t(this, "monitor_start_failed"), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -172,6 +197,7 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun setLanguage(language: String) {
             NativeLanguage.set(this@MainActivity, language)
+            runOnUiThread { invalidateOptionsMenu() }
         }
     }
 
@@ -226,7 +252,7 @@ class MainActivity : Activity() {
                 }
 
                 return try {
-                    val chooserIntent = Intent.createChooser(galleryIntent, "Add road photo").apply {
+                    val chooserIntent = Intent.createChooser(galleryIntent, NativeLanguage.t(this@MainActivity, "add_road_photo")).apply {
                         if (cameraIntents.isNotEmpty()) {
                             putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toTypedArray())
                         }
