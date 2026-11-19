@@ -83,7 +83,7 @@ jobs:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_GCM_SENDER_ID: ${{ secrets.FIREBASE_GCM_SENDER_ID }}
         run: |
-          gradle --no-daemon :app:bundleRelease
+          bash ./ci-build-release.sh
           test -s app/build/outputs/bundle/release/app-release.aab
           echo "Unsigned release candidate compiled. Never upload this artifact to Play Console."
 
@@ -109,7 +109,7 @@ jobs:
             -keypass "$ANDROID_KEY_PASSWORD" -alias "$ANDROID_KEY_ALIAS" \
             -keyalg RSA -keysize 2048 -validity 30 \
             -dname "CN=CDL Hub Temporary CI Test, O=CI Only" > /dev/null 2>&1
-          gradle --no-daemon :app:bundleRelease
+          bash ./ci-build-release.sh
           BUNDLE="app/build/outputs/bundle/release/app-release.aab"
           VERIFY_OUTPUT="$(jarsigner -verify "$BUNDLE" 2>&1)"
           grep -q '^jar verified\.' <<< "$VERIFY_OUTPUT"
