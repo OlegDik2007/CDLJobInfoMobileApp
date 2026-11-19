@@ -7,7 +7,7 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId 'info.cdljob.driverhub'
+        applicationId 'com.avidetechnologies.cdlroadhub'
         minSdk 26
         targetSdk 36
         versionCode 12
