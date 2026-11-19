@@ -26,12 +26,12 @@
         </provider>
 
         <service
-            android:name=".RoadLocationService"
+            android:name="info.cdljob.driverhub.RoadLocationService"
             android:exported="false"
             android:foregroundServiceType="location"
             android:stopWithTask="false" />
         <service
-            android:name=".CdlFirebaseMessagingService"
+            android:name="info.cdljob.driverhub.CdlFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -39,7 +39,7 @@
         </service>
 
         <activity
-            android:name=".MainActivity"
+            android:name="info.cdljob.driverhub.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
