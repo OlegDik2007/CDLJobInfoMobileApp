@@ -11,6 +11,7 @@ object DeviceApi {
     private const val BASE_URL = "https://cdljob.info"
     private const val PREFS = "cdl_device_api"
     private const val PUSH_REGISTERED = "push_registered"
+    private const val PUSH_REGISTERED_AT = "push_registered_at"
     private const val PUSH_TOKEN = "push_token"
     private val executor = Executors.newSingleThreadExecutor()
 
@@ -28,8 +29,10 @@ object DeviceApi {
     }
 
     fun isPushRegistered(context: Context): Boolean {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getBoolean(PUSH_REGISTERED, false)
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val at = prefs.getLong(PUSH_REGISTERED_AT, 0L)
+        return prefs.getBoolean(PUSH_REGISTERED, false) && at > 0 &&
+            System.currentTimeMillis() - at < 24L * 60L * 60L * 1000L
     }
 
     fun registerPushToken(context: Context, token: String) {
@@ -52,8 +55,15 @@ object DeviceApi {
             .put("app_version", appVersion(context))
             .put("enabled", enabled)
 
-        post("/api/mobile-device-register", body) { ok, _ ->
-            prefs.edit().putBoolean(PUSH_REGISTERED, ok && enabled).apply()
+        post("/api/mobile-device-register", body) { ok, response ->
+            val accepted = ok && response?.optBoolean("registered", false) == true
+            prefs.edit()
+                .putBoolean(PUSH_REGISTERED, accepted)
+                .putLong(PUSH_REGISTERED_AT, if (accepted) System.currentTimeMillis() else 0L)
+                .apply()
+            if (!accepted) android.util.Log.w("CDLPush", "Device token registration failed")
+            else if (enabled && response?.optJSONObject("push")?.optBoolean("configured", false) != true)
+                android.util.Log.w("CDLPush", "Device registered, but backend push provider is unavailable")
         }
     }
 
@@ -63,7 +73,7 @@ object DeviceApi {
         longitude: Double,
         accuracyMeters: Float?,
         heading: Float?,
-        onPushStatus: ((Boolean) -> Unit)? = null
+        onPushStatus: ((Boolean?) -> Unit)? = null
     ) {
         val body = JSONObject()
             .put("device_id", deviceId(context))
@@ -76,8 +86,10 @@ object DeviceApi {
             .put("enabled", isRoadMonitoringEnabled(context))
 
         post("/api/mobile-device-location", body) { ok, response ->
-            val configured = ok &&
-                response?.optJSONObject("push")?.optBoolean("configured", false) == true
+            // null is network failure; do not claim the provider is disabled.
+            val configured = if (ok && response?.optJSONObject("push") != null)
+                response.optJSONObject("push").optBoolean("configured", false)
+            else null
             onPushStatus?.invoke(configured)
         }
     }
