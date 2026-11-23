@@ -1,5 +1,8 @@
 package info.cdljob.driverhub
 
+import android.Manifest
+import android.os.Build
+import android.content.pm.PackageManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -41,7 +44,7 @@ object RoadAlertChecker {
                     connectTimeout = 10_000
                     readTimeout = 10_000
                     setRequestProperty("Accept", "application/json")
-                    setRequestProperty("User-Agent", "CDLDriverHubAndroid/0.9.1")
+                    setRequestProperty("User-Agent", "CDLHubAndroid/${BuildConfig.VERSION_NAME}")
                 }
 
                 val response = try {
@@ -103,7 +106,12 @@ object RoadAlertChecker {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         if (prefs.contains(alertKey)) return
 
+        // Do not record an alert as seen if Android cannot display it.
+        if (Build.VERSION.SDK_INT >= 33 &&
+            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) return
         val manager = context.getSystemService(NotificationManager::class.java)
+        if (!manager.areNotificationsEnabled()) return
         manager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
@@ -114,6 +122,8 @@ object RoadAlertChecker {
                 enableVibration(true)
             }
         )
+
+        if (manager.getNotificationChannel(CHANNEL_ID)?.importance == NotificationManager.IMPORTANCE_NONE) return
 
         val route = item.optString("route")
         val relation = item.optString("relation", "nearby")
