@@ -15,6 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CDLDriverHub"
         android:usesCleartextTraffic="false">
+        <!-- FCM uses this pre-created high-priority channel for background messages. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="cdl_road_alerts" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

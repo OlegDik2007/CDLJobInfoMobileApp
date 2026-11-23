@@ -10,6 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
+import android.app.NotificationManager
 import android.view.View
 import android.view.ContextThemeWrapper
 import android.view.Menu
@@ -47,6 +49,7 @@ class MainActivity : Activity() {
     private var pendingGeoOrigin: String? = null
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var cameraImageUri: Uri? = null
+    private var pendingLocalNotificationTest = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +77,8 @@ class MainActivity : Activity() {
         setActionBar(toolbar)
 
         configureWebView()
+        // The high-priority channel must exist before FCM posts background notifications.
+        CdlFirebaseMessagingService.ensureAlertChannel(this)
         initializePush()
         requestNotificationPermissionIfNeeded()
         startRoadTrackingIfAllowed()
@@ -109,13 +114,21 @@ class MainActivity : Activity() {
     }
 
     private fun initializePush() {
-        if (!FirebaseBootstrap.initialize(this)) return
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                task.result?.let { DeviceApi.registerPushToken(this, it) }
-            }
+        if (!FirebaseBootstrap.initialize(this)) {
+            Log.w("CDLPush", "Android Firebase client configuration is missing; remote notifications unavailable")
+            return
         }
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            val token = if (task.isSuccessful) task.result else null
+            if (!token.isNullOrBlank()) DeviceApi.registerPushToken(this, token)
+            else Log.w("CDLPush", "FCM token unavailable; will retry after reopening CDL Hub")
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Retrying is safe even if a valid token already exists: registration is idempotent.
+        if (!DeviceApi.isPushRegistered(this)) initializePush()
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -167,6 +180,35 @@ class MainActivity : Activity() {
         Toast.makeText(this, NativeLanguage.t(this, "monitor_enabled"), Toast.LENGTH_LONG).show()
     }
 
+    private fun testLocalNotification() {
+        // This checks Android notification permission and channel, NOT Firebase delivery.
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            pendingLocalNotificationTest = true
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_REQUEST)
+            return
+        }
+        val manager = getSystemService(NotificationManager::class.java)
+        CdlFirebaseMessagingService.ensureAlertChannel(this)
+        val channel = manager.getNotificationChannel(CdlFirebaseMessagingService.ALERT_CHANNEL_ID)
+        if (!manager.areNotificationsEnabled() || channel?.importance == NotificationManager.IMPORTANCE_NONE) {
+            AlertDialog.Builder(this)
+                .setTitle("Road notifications are blocked")
+                .setMessage("Enable CDL Hub notifications and the Road alerts channel in Android settings.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Open settings") { _, _ ->
+                    startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                    })
+                }
+                .show()
+            return
+        }
+        CdlFirebaseMessagingService.showLocalTestNotification(this)
+        Toast.makeText(this, "Test posted locally. Firebase push delivery must be tested separately.", Toast.LENGTH_LONG).show()
+    }
+
     private fun requestRoadMonitoringConsent() {
         AlertDialog.Builder(this)
             .setTitle(NativeLanguage.t(this, "monitor_title"))
@@ -179,6 +221,9 @@ class MainActivity : Activity() {
     private inner class RoadMonitoringBridge {
         @JavascriptInterface
         fun start() = runOnUiThread { requestRoadMonitoringConsent() }
+
+        @JavascriptInterface
+        fun testNotification() = runOnUiThread { testLocalNotification() }
 
         @JavascriptInterface
         fun stop() = runOnUiThread {
@@ -211,7 +256,7 @@ class MainActivity : Activity() {
             loadWithOverviewMode = true
             useWideViewPort = true
             mediaPlaybackRequiresUserGesture = true
-            userAgentString = "$userAgentString CDLDriverHubAndroid/0.9.1 Kotlin"
+            userAgentString = "$userAgentString CDLHubAndroid/${BuildConfig.VERSION_NAME} Kotlin"
             cacheMode = WebSettings.LOAD_DEFAULT
         }
 
@@ -327,6 +372,12 @@ class MainActivity : Activity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == NOTIFICATION_REQUEST) {
+            val testRequested = pendingLocalNotificationTest
+            pendingLocalNotificationTest = false
+            if (testRequested) {
+                if (grantResults.any { it == PackageManager.PERMISSION_GRANTED }) testLocalNotification()
+                else Toast.makeText(this, "Notifications denied. Enable CDL Hub notifications in Android settings.", Toast.LENGTH_LONG).show()
+            }
             return
         }
 

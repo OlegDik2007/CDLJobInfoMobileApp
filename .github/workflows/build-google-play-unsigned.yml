@@ -8,6 +8,7 @@ on:
       - '.github/workflows/build-google-play-unsigned.yml'
       - '.github/workflows/build-google-play-signed.yml'
       - 'docs/GOOGLE-PLAY-INTERNAL-TESTING.md'
+      - 'scripts/tests/test_android_notifications.py'
   push:
     branches: [main]
     paths:
@@ -29,6 +30,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Native notification, permission and Play version regressions
+        working-directory: .
+        run: python3 scripts/tests/test_android_notifications.py
+
       - name: Validate release identity and key security
         run: |
           python3 - <<'PY'
@@ -38,8 +43,8 @@ jobs:
           manifest=Path("app/src/main/AndroidManifest.xml").read_text()
           expected={
             "applicationId": r"applicationId\s+['\"]com\.avidetechnologies\.cdlroadhub['\"]",
-            "versionCode": r"versionCode\s+12\b",
-            "versionName": r"versionName\s+['\"]1\.0\.0-rc1['\"]",
+            "versionCode": r"versionCode\s+13\b",
+            "versionName": r"versionName\s+['\"]1\.0\.1-rc2['\"]",
             "targetSdk": r"targetSdk\s+36\b",
           }
           for name, pattern in expected.items():
@@ -90,7 +95,7 @@ jobs:
       - name: Upload review-only unsigned bundle
         uses: actions/upload-artifact@v4
         with:
-          name: CDLHub-v12-UNSIGNED-DO-NOT-PUBLISH
+          name: CDLHub-v13-UNSIGNED-DO-NOT-PUBLISH
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 5
           if-no-files-found: error

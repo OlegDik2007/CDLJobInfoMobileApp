@@ -39,12 +39,15 @@ class RoadLocationService : Service() {
                 if (location.hasAccuracy()) location.accuracy else null,
                 bearing
             ) { backendPushConfigured ->
-                val remotePushReady =
-                    firebaseConfigured &&
-                    DeviceApi.isPushRegistered(this@RoadLocationService) &&
-                    backendPushConfigured
+                val registered = DeviceApi.isPushRegistered(this@RoadLocationService)
+                // On a temporary API outage an already registered FCM device
+                // should not receive a duplicate local copy of the same alert.
+                // Missing client credentials / no server ack / explicitly disabled
+                // backend push safely uses the existing on-device road checker.
+                val useLocalFallback = !firebaseConfigured || !registered ||
+                    backendPushConfigured == false
 
-                if (!remotePushReady) {
+                if (useLocalFallback) {
                     RoadAlertChecker.check(
                         this@RoadLocationService,
                         location.latitude,

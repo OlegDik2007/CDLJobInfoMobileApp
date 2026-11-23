@@ -141,13 +141,13 @@ jobs:
             echo "::error::AAB signer does not match the intended upload key"
             exit 1
           fi
-          echo "### CDL Hub signed internal-test candidate (versionCode 12)" >> "$GITHUB_STEP_SUMMARY"
+          echo "### CDL Hub signed internal-test candidate (versionCode 13)" >> "$GITHUB_STEP_SUMMARY"
           echo "AAB cryptographic signature matches the upload key; confirm package in Play Console before upload" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload signed bundle as artifact (not a store submission)
         uses: actions/upload-artifact@v4
         with:
-          name: CDLHub-GooglePlay-v12-signed-AAB
+          name: CDLHub-GooglePlay-v13-signed-AAB
           path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
