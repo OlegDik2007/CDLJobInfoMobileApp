@@ -90,7 +90,7 @@ jobs:
       - name: Upload review-only unsigned bundle
         uses: actions/upload-artifact@v4
         with:
-          name: CDLHub-v12-UNSIGNED-DO-NOT-PUBLISH
+          name: CDLHub-v13-UNSIGNED-DO-NOT-PUBLISH
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 5
           if-no-files-found: error
