@@ -38,8 +38,8 @@ jobs:
           manifest=Path("app/src/main/AndroidManifest.xml").read_text()
           expected={
             "applicationId": r"applicationId\s+['\"]com\.avidetechnologies\.cdlroadhub['\"]",
-            "versionCode": r"versionCode\s+12\b",
-            "versionName": r"versionName\s+['\"]1\.0\.0-rc1['\"]",
+            "versionCode": r"versionCode\s+13\b",
+            "versionName": r"versionName\s+['\"]1\.0\.1-rc2['\"]",
             "targetSdk": r"targetSdk\s+36\b",
           }
           for name, pattern in expected.items():
